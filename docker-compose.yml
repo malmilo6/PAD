@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: mysql-container-pad
+    image: mysql:8.0
+    restart: always
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./mysql:/var/lib/mysql
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${SQL_ROOT_PASSWORD}
+      - MYSQL_USER=${SQL_USER}
+      - MYSQL_PASSWORD=${SQL_PASSWORD}
+      - MYSQL_DATABASE=${SQL_DATABASE}
+    ports:
+      - 3306:3306
+
+#  web:
+#    container_name: django-web-pad
+#    build:
+#      context: ./weather_alert
+#      dockerfile: Dockerfile
+#    command: python manage.py runserver 0.0.0.0:8000
+#    volumes:
+#      - ./weather_alert/:/usr/src/app/
+#    env_file:
+#      - .env
+#    ports:
+#      - 8000:8000
+#    depends_on:
+#      - db
+#    links:
+#      - db
+
+  weather_data_service:
+    container_name: django-weather-data-service
+    build:
+      context: ./weather_data_service
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./weather_data_service/:/usr/src/weather_data_service/
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
+  user_alert_service:
+    container_name: django-user-alert-service
+    build:
+      context: ./user_alert_service
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8001
+    volumes:
+      - ./user_alert_service/:/usr/src/user_alert_service/
+    env_file:
+      - .env
+    ports:
+      - 8001:8001
+    depends_on:
+      - db
