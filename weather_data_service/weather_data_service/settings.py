@@ -76,12 +76,12 @@ WSGI_APPLICATION = 'weather_data_service.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, 'db.sqlite3')),
-        "USER": os.environ.get("SQL_USER", "myuser"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "myuserpassword"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "3306"),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.mysql"),
+        "NAME": os.environ.get("SQL_DATABASE_WDS"),
+        "USER": os.environ.get("SQL_USER_WDS"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD_WDS"),
+        "HOST": os.environ.get("SQL_HOST_WDS"),
+        "PORT": "3307",
     }
 }
 
