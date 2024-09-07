@@ -3,7 +3,7 @@
 if [ "$DATABASE" = "mysql" ]
 then
     echo "Waiting for mysql..."
-    while ! nc -z $SQL_HOST_WDS $SQL_PORT_WDS; do
+    while ! nc -z $SQL_HOST $SQL_PORT; do
       sleep 0.1
     done
     echo "MySQL started"

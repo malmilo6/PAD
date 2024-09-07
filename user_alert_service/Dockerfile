@@ -1,34 +1,17 @@
-FROM python:3.9
+FROM python:3.8
 
-# set work directory
+# Set the working directory in the container
 WORKDIR /usr/src/app
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Install any needed packages specified in requirements.txt
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-# install mysql dependencies
-RUN apt-get update
-RUN apt-get install gcc default-libmysqlclient-dev -y
-
-# install dependencies
-RUN pip install -U pip setuptools wheel
-RUN pip install --upgrade pip
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt --no-cache-dir
-
-# copy project
+# Copy the rest of the application's code
 COPY . .
 
-# Convert plain text files to Unix
-RUN apt-get install dos2unix
-RUN dos2unix --newfile docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+# Expose port 8000 for the application
+EXPOSE 8000
 
-# Make entrypoint executable
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-## Entrypoint dependencies
-RUN apt-get install netcat-openbsd -y
-
-# run entrypoint.sh
-ENTRYPOINT ["bash", "/usr/local/bin/docker-entrypoint.sh"]
+# Run the application
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

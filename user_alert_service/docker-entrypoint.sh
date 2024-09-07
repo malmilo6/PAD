@@ -1,19 +1,14 @@
 #!/bin/bash
 
-if [ "$DATABASE" = "mysql" ]
-then
-    echo "Waiting for mysql..."
-    while ! nc -z $SQL_HOST_UAS $SQL_PORT_UAS; do
-      sleep 0.1
-    done
-    echo "MySQL started"
-fi
-
-# echo "Clear entire database"
-# python manage.py flush --no-input
+# Check if MongoDB is up and running on the specified host and port
+echo "Waiting for MongoDB at $MONGO_HOST..."
+while ! nc -z $MONGO_HOST $MONGO_PORT; do
+  sleep 1
+done
+echo "MongoDB started"
 
 echo "Applying database migrations..."
-python manage.py makemigrations 
+python manage.py makemigrations
 python manage.py migrate
 
 exec "$@"

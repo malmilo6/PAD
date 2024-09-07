@@ -76,16 +76,19 @@ WSGI_APPLICATION = 'user_alert_service.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE_UAS"),
-        "USER": os.environ.get("SQL_USER_UAS"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD_UAS"),
-        "HOST": os.environ.get("SQL_HOST_UAS"),
-        "PORT": os.environ.get("SQL_PORT_UAS", "3306"),
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'db_uas',
+        'CLIENT': {
+            'host': 'mongodb://mongodb:27017',
+            'username': 'root',
+            'password': 'mongoadmin',
+            'authSource': 'admin',
+            'authMechanism': 'SCRAM-SHA-1',
+        }
     }
-}
 
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

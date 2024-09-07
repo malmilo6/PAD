@@ -1,6 +1,3 @@
-
-
-# Django
 *.log
 .pot
 .pyc
@@ -8,7 +5,8 @@ __pycache__
 migrations
 
 mysql
-
+data-db
+init-db
 staticfiles
 
 .idea
