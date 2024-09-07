@@ -38,3 +38,119 @@ Both services are containerized using Docker, allowing for consistency across de
 Includes load balancing within each service to distribute requests evenly across instances, enhancing reliability and responsiveness.
 
 Continuous monitoring of both services' performance and health via endpoints, with automated scaling to maintain optimal performance levels.
+
+# API Documentation
+
+## Weather Alert Service
+
+### 1. Retrieve Weather Data
+Retrieve all weather data entries for a specific location, or all entries if no location is specified.
+
+- **URL**: `/weather/`
+- **Method**: `GET`
+- **URL Params**: 
+  - Optional: `location=[string]`
+- **Success Response**:
+  - **Code**: 200
+  - **Content**: Array of weather data objects
+- **Error Response**:
+  - **Code**: 404 NOT FOUND
+  - **Content**: `{ error : "Data not found" }`
+
+### 2. Get Future Weather Alerts
+Get future weather alerts for a specified location.
+
+- **URL**: `/weather/alerts/future/`
+- **Method**: `GET`
+- **Query Params**: 
+  - Required: `location=[string]`
+- **Success Response**:
+  - **Code**: 200
+  - **Content**: Array of future weather alert objects
+- **Error Response**:
+  - **Code**: 404 NOT FOUND
+  - **Content**: `{ error : "Alerts not found for location" }`
+
+### 3. Create Weather Data Entry
+Create a new weather data entry.
+
+- **URL**: `/weather/create/`
+- **Method**: `POST`
+- **Data Params**:
+  ```json
+  {
+    "timestamp": "[datetime]",
+    "location": "[string]",
+    "temperature": "[float]",
+    "humidity": "[float]",
+    "wind_speed": "[float]",
+    "weather_condition": "[string]"
+  }
+- **Success Response**:
+  - **Code**: 201 CREATED
+- **Error Response**:
+  - **Code**: 404 NOT FOUND
+  - **Content**: `{ error : "Invalid data" }`
+
+#### 4. Delete Weather Data Entry
+- **Endpoint**: `DELETE /weather/delete/{id}/`
+- **Description**: Delete a specific weather data entry.
+- **URL Params**:
+  - `id` (required): The ID of the weather data entry to delete.
+- **Success Response**:
+  - **Code**: 204 NO CONTENT
+- **Error Response**:
+  - **Code**: 404 NOT FOUND
+  - **Content**: `{ "error" : "Data not found" }`
+
+#### 5. Retrieve Severe Weather Alert Prediction
+- **Endpoint**: `GET /weather/predictions/`
+- **Description**: Retrieve predictions for severe weather based on current data trends.
+- **Success Response**:
+  - **Code**: 200
+  - **Content**: Array of prediction data
+- **Error Response**:
+  - **Code**: 404 NOT FOUND
+  - **Content**: `{ "error" : "Predictions not available" }`
+
+## User Alert Service
+
+#### 1. Get Weather Report for Location
+- **Endpoint**: `GET /profiles/weather-report/`
+- **Description**: Get a detailed weather report for a specified location.
+- **Query Params**:
+  - `location` (required)
+- **Success Response**:
+  - **Code**: 200
+  - **Content**: Weather report data
+- **Error Response**:
+  - **Code**: 404 NOT FOUND
+  - **Content**: `{ "error" : "Location not found" }`
+
+#### 2. Update User Alert Preferences
+- **Endpoint**: `PATCH /profiles/update/{id}/`
+- **Description**: Update the alert preferences associated with a user profile.
+- **URL Params**:
+  - `id` (required)
+- **Data Params**:
+  ```json
+  {
+    "alert_preferences": {
+      "email": "boolean",
+      "sms": "boolean",
+      "push_notification": "boolean"
+    }
+  }
+- **Success Response**:
+  - **Code**: 200
+  - **Content**: `{ "message": "Preferences updated successfully." }`
+- **Error Response**:
+  - **Code**: 404 BAD REQUEST
+  - **Content**: `{ "error": "Invalid request" }`
+
+#### 3. WS Communication
+- **WS URL**: `ws://[host]/ws/alerts/`
+- **Protocol**: WebSocket
+- **Functionality**:
+  - **Clients connect to receive real-time alerts.**
+  - **Server sends alert messages when conditions meet user-specified preferences.**
