@@ -39,6 +39,9 @@ Includes load balancing within each service to distribute requests evenly across
 
 Continuous monitoring of both services' performance and health via endpoints, with automated scaling to maintain optimal performance levels.
 
+## System Diagram
+![Screenshot_1](https://github.com/user-attachments/assets/363b922f-46c1-402e-b03e-0436b3c6bcb5)
+
 # API Documentation
 
 ## Weather Alert Service
