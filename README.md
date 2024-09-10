@@ -38,6 +38,7 @@ MongoDB and MySQL are used for persisting different types of data. MongoDB, bein
 **Technologies:** WebSockets for real-time alert notifications to clients, a relational database to manage user information and preferences.
 
 Both microservices use Python (Django), and NodeJs for Gateway.
+
 **Communication:** Uses gRPC for server-to-server communication and WebSockets for real-time client updates.
 ### Gateway
 1.  Directs requests for data processing and alert notifications to the respective services.
