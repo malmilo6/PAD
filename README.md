@@ -15,14 +15,29 @@ Operates independently with its own database and caching mechanisms to ensure pe
 Manages user data and preferences, receives alerts from the processing service, and delivers these alerts to users via various channels. 
 
 Manages its own user database and handles communication back to the data processing service for feedback on delivery success.
+
+![image](https://github.com/user-attachments/assets/4482fbda-f803-4671-9840-956924c38381)
+
+The actor, which could be an end-user or another service, interacts with the system by making HTTP/1.1 requests to the Gateway.
+
+The Gateway serves as entry point and communicates with back-end services through gRPC calls. It's also responsible for interacting with the Service Discovery component to locate services within the architecture.
+
+Service Discovery is responsible for maintaining a registry of services (like User Alert Service and Weather Data Service) and their instances. It helps the Gateway locate these services dynamically, aiding in the resilience and scalability of the system.
+
+These two services handle specific business logic. The User Alert Service manages user data and alert preferences and relies on MongoDB for data storage. The Weather Data Service processes and stores weather data using MySQL.
+
+Redis is utilized as a shared cache, likely to store frequently accessed data like session information, cached weather data, or user preferences. Both services can quickly access this shared cache to improve performance and reduce database load.
+
+MongoDB and MySQL are used for persisting different types of data. MongoDB, being a NoSQL database, is likely used here for its flexibility in handling unstructured data, such as user profiles or alert settings. MySQL, a relational database, is suitable for structured data like weather records which require complex queries and transactional integrity.
 ## Technology Stack and Communication Patterns
 ### Weather Alert Service
-**Technologies:** Utilizes gRPC for efficient communication with the notification service, databases for persistent storage, and caching mechanisms to enhance access to frequently used data.\
+**Technologies:** Utilizes gRPC for efficient communication with the notification service, databases for persistent storage, and caching mechanisms to enhance access to frequently used data. 
 
 **Communication:** Implements gRPC for fast, reliable, and secure inter-service communication.
 ### User Alert Service
 **Technologies:** WebSockets for real-time alert notifications to clients, a relational database to manage user information and preferences.
 
+Both microservices use Python (Django), and NodeJs for Gateway.
 **Communication:** Uses gRPC for server-to-server communication and WebSockets for real-time client updates.
 ### Gateway
 1.  Directs requests for data processing and alert notifications to the respective services.
@@ -30,7 +45,7 @@ Manages its own user database and handles communication back to the data process
 3. Stores frequently accessed data like weather conditions to speed up response times for common queries.
 
 ## Data Management
-Uses a database for storing raw and processed weather data, and user data.
+Uses a database for storing raw and processed weather data, and user data. Mongo DB for User Alert Service, storing user data, and preferences. MySQL for Weather Data Service, store and process weather data.
 
 ## Deployment and Scaling
 Both services are containerized using Docker, allowing for consistency across development, testing, and production environments. 
@@ -38,9 +53,6 @@ Both services are containerized using Docker, allowing for consistency across de
 Includes load balancing within each service to distribute requests evenly across instances, enhancing reliability and responsiveness.
 
 Continuous monitoring of both services' performance and health via endpoints, with automated scaling to maintain optimal performance levels.
-
-## System Diagram
-![Screenshot_1](https://github.com/user-attachments/assets/363b922f-46c1-402e-b03e-0436b3c6bcb5)
 
 # API Documentation
 
@@ -152,8 +164,8 @@ Create a new weather data entry.
   - **Content**: `{ "error": "Invalid request" }`
 
 #### 3. WS Communication
-- **WS URL**: `ws://[host]/ws/alerts/`
+- **WS URL**: `ws://[host]/ws/alerts/[location]`
 - **Protocol**: WebSocket
 - **Functionality**:
   - **Clients connect to receive real-time alerts.**
-  - **Server sends alert messages when conditions meet user-specified preferences.**
+  - **Server sends alert messages when conditions meet user-specified preferences, based on location option(multiple channels).**
