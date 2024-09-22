@@ -165,8 +165,8 @@ Create a new weather data entry.
   - **Content**: `{ "error": "Invalid request" }`
 
 #### 3. WS Communication
-- **WS URL**: `ws://[host]/ws/alerts/[location]`
+- **WS URL**: `ws://[host]/ws/alerts/`
 - **Protocol**: WebSocket
 - **Functionality**:
   - **Clients connect to receive real-time alerts.**
-  - **Server sends alert messages when conditions meet user-specified preferences, based on location option(multiple channels).**
+  - **Server sends alert messages when conditions meet user-specified preferences.**

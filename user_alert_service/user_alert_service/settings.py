@@ -26,8 +26,14 @@ SECRET_KEY = 'django-insecure-x7qtzxm_*fyx+7^0c-4*fm7@e5$41%8y7e^9c5+%d5m+bxt@x*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'django-user-alert-service',
+    'django-weather-data-service',
+    'your-domain.com',
+    '0.0.0.0',
+]
 
 # Application definition
 
@@ -38,7 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'backend'
+    'backend',
+    'rest_framework',
+    'django_filters'
 ]
 
 MIDDLEWARE = [

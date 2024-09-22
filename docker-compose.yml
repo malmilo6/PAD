@@ -38,12 +38,15 @@ services:
       dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8001
     volumes:
-      - ./user_alert_service/:/usr/src/user_alert_service/
+      - ./user_alert_service/:/usr/src/app
     env_file:
       - .env
     ports:
       - 8001:8001
+      - 50051:50051 # gRPC port
     depends_on:
+      - mongodb
+    links:
       - mongodb
 
   weather_data_service:
@@ -53,12 +56,30 @@ services:
       dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./weather_data_service/:/usr/src/weather_data_service/
+      - ./weather_data_service/:/usr/src/app
     env_file:
       - .env
     ports:
       - 8000:8000
+      - 50052:50051 # gRPC port
     depends_on:
       - db_wds
-volumes:
-  mongo-data-uas:
+    links:
+      - db_wds
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user_alert_service
+      - weather_data_service
+      - redis
