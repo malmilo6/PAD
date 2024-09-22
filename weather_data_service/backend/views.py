@@ -11,7 +11,7 @@ import time
 class HealthCheck(APIView):
     @timeout(seconds=5)
     def get(self, request):
-        time.sleep(10) # Test time out
+        time.sleep(10) # Test time ou
         return Response({"status": "healthy"}, status=200)
 
 
