@@ -48,13 +48,13 @@ const cacheMiddleware = async (req, res, next) => {
 
 // Proxy for Weather Data Service
 
-app.use('/api/v1/health', createProxyMiddleware({
+app.use('/api/v1/health_wds', createProxyMiddleware({
     target: 'http://django-weather-data-service:8000',
     changeOrigin: true,
 }));
 
 // Proxy for User Alert Service
-app.use('/api/v1/health', createProxyMiddleware({
+app.use('/api/v1/health_uas', createProxyMiddleware({
     target: 'http://django-user-alert-service:8001',
     changeOrigin: true,
 }));
