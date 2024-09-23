@@ -1,8 +1,14 @@
+import datetime
+import time
+
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from services import get_current_weather, get_weather_prediction
 from backend.utils import *
+from backend.models import WeatherReport
+from django.utils import timezone
+
 
 class CurrentWeatherView(APIView):
     @timeout(seconds=10)
@@ -15,8 +21,22 @@ class CurrentWeatherView(APIView):
             "wind_speed": weather_data.wind_speed,
         })
 
-class WeatherPredictionView(APIView):
+
+class GenerateWeatherReportView(APIView):
     @timeout(seconds=10)
+    def get(self, request, location):
+        weather_data = get_current_weather(location)
+        WeatherReport.objects.create(
+            location=weather_data.location,
+            temperature=weather_data.temperature,
+            wind_speed=weather_data.wind_speed,
+            precipitation=weather_data.weather,
+            reported_at=timezone.now()
+        )
+        return 200
+
+
+class WeatherPredictionView(APIView):
     def get(self, request, location):
         weather_data = get_weather_prediction(location)
         return Response({

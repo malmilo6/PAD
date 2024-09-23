@@ -19,7 +19,7 @@ redisClient.connect().catch((err) => {
 // Concurent task limiter
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 2, // limit each IP up to 100 reqs
+    max: 100, // limit each IP up to 100 reqs
     message: "Too many requests, please try again later.",
 });
 
@@ -60,6 +60,23 @@ app.use('/api/v1/health_uas', createProxyMiddleware({
 }));
 
 app.use('/api/v1/current-weather', cacheMiddleware, async (req, res) => {
+    const cacheKey = req.originalUrl;
+
+    try {
+        const response = await axios.get('http://django-user-alert-service:8001' + req.originalUrl);
+
+        // Cache
+        await redisClient.setEx(cacheKey, 60, JSON.stringify(response.data));
+
+        res.status(200).json(response.data);
+    } catch (error) {
+        console.error('Error fetching health data:', error);
+        res.status(500).json({ error: 'Unable to fetch health data' });
+    }
+});
+
+
+app.use('/api/v1/weather-prediction', cacheMiddleware, async (req, res) => {
     const cacheKey = req.originalUrl;
 
     try {

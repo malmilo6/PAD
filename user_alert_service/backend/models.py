@@ -4,16 +4,12 @@ from django.utils import timezone
 
 
 class UserProfile(models.Model):
-    email = models.EmailField(unique=True)
+    username = models.TextField(unique=True)
     is_subscribed = models.BooleanField(default=True, help_text="Is the user subscribed to receive alerts?")
-    preferred_notification_method = models.CharField(
-        max_length=50,
-        choices=[('email', 'Email'), ('sms', 'SMS'), ('push', 'Push Notification')],
-        default='email'
-    )
+    subscription_area = models.TextField()
 
     def __str__(self):
-        return self.email
+        return self.username
 
 
 # UserAlert - Stores alerts generated for users
@@ -23,6 +19,7 @@ class UserAlert(models.Model):
         ('flood', 'Flood'),
         ('heatwave', 'Heatwave'),
         ('rain', 'Rain'),
+        ('normal', 'Normal')
     )
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     alert_type = models.CharField(max_length=50, choices=ALERT_TYPES)
