@@ -11,3 +11,14 @@ def get_current_weather(location):
     except grpc.RpcError as e:
         print(f"gRPC error: {e.code()}, {e.details()}")
         return None
+
+def get_weather_prediction(location):
+    try:
+        with grpc.insecure_channel('django-weather-data-service:50051') as channel:
+            stub = weather_service_pb2_grpc.WeatherServiceStub(channel)
+            request = weather_service_pb2.WeatherPredictionRequest(location=location)
+            response = stub.GetWeatherPrediction(request)
+            return response
+    except grpc.RpcError as e:
+        print(f"gRPC error: {e.code()}, {e.details()}")
+        return None

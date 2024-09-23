@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ntest.proto\x12\x0eweatherService\"\"\n\x0eWeatherRequest\x12\x10\n\x08location\x18\x01 \x01(\t\"]\n\x0fWeatherResponse\x12\x10\n\x08location\x18\x01 \x01(\t\x12\x0f\n\x07weather\x18\x02 \x01(\t\x12\x13\n\x0btemperature\x18\x03 \x01(\x02\x12\x12\n\nwind_speed\x18\x04 \x01(\x02\x32\x66\n\x0eWeatherService\x12T\n\x11GetCurrentWeather\x12\x1e.weatherService.WeatherRequest\x1a\x1f.weatherService.WeatherResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ntest.proto\x12\x0eweatherService\"\"\n\x0eWeatherRequest\x12\x10\n\x08location\x18\x01 \x01(\t\"]\n\x0fWeatherResponse\x12\x10\n\x08location\x18\x01 \x01(\t\x12\x0f\n\x07weather\x18\x02 \x01(\t\x12\x13\n\x0btemperature\x18\x03 \x01(\x02\x12\x12\n\nwind_speed\x18\x04 \x01(\x02\",\n\x18WeatherPredictionRequest\x12\x10\n\x08location\x18\x01 \x01(\t\"\xc3\x01\n\x19WeatherPredictionResponse\x12\x10\n\x08location\x18\x01 \x01(\t\x12\x15\n\rforecast_date\x18\x02 \x01(\t\x12\x1d\n\x15predicted_temperature\x18\x03 \x01(\x02\x12\x1c\n\x14predicted_wind_speed\x18\x04 \x01(\x02\x12\x1f\n\x17predicted_precipitation\x18\x05 \x01(\x02\x12\x1f\n\x17prediction_generated_at\x18\x06 \x01(\t2\xd3\x01\n\x0eWeatherService\x12T\n\x11GetCurrentWeather\x12\x1e.weatherService.WeatherRequest\x1a\x1f.weatherService.WeatherResponse\x12k\n\x14GetWeatherPrediction\x12(.weatherService.WeatherPredictionRequest\x1a).weatherService.WeatherPredictionResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,6 +35,10 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_WEATHERREQUEST']._serialized_end=64
   _globals['_WEATHERRESPONSE']._serialized_start=66
   _globals['_WEATHERRESPONSE']._serialized_end=159
-  _globals['_WEATHERSERVICE']._serialized_start=161
-  _globals['_WEATHERSERVICE']._serialized_end=263
+  _globals['_WEATHERPREDICTIONREQUEST']._serialized_start=161
+  _globals['_WEATHERPREDICTIONREQUEST']._serialized_end=205
+  _globals['_WEATHERPREDICTIONRESPONSE']._serialized_start=208
+  _globals['_WEATHERPREDICTIONRESPONSE']._serialized_end=403
+  _globals['_WEATHERSERVICE']._serialized_start=406
+  _globals['_WEATHERSERVICE']._serialized_end=617
 # @@protoc_insertion_point(module_scope)
