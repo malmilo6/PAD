@@ -7,6 +7,6 @@ router.register(r'weather-data', WeatherDataViewSet)
 router.register(r'weather-prediction', WeatherPredictionViewSet)
 
 url_patterns = [
-    path('health_wds/', HealthCheck.as_view()),
+    path('health/', HealthCheck.as_view()),
     path('', include(router.urls))
 ]

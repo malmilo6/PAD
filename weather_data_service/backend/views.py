@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,7 +10,6 @@ import time
 class HealthCheck(APIView):
     @timeout(seconds=5)
     def get(self, request):
-        # time.sleep(10) # Test time out
         return Response({"status": "healthy"}, status=200)
 
 

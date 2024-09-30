@@ -48,16 +48,16 @@ const cacheMiddleware = async (req, res, next) => {
 
 // Proxy for Weather Data Service
 
-app.use('/api/v1/health_wds', createProxyMiddleware({
-    target: 'http://django-weather-data-service:8000',
-    changeOrigin: true,
-}));
-
-// Proxy for User Alert Service
-app.use('/api/v1/health_uas', createProxyMiddleware({
-    target: 'http://django-user-alert-service:8001',
-    changeOrigin: true,
-}));
+// app.use('/api/v1/health_wds', createProxyMiddleware({
+//     target: 'http://django-weather-data-service:8000',
+//     changeOrigin: true,
+// }));
+//
+// // Proxy for User Alert Service
+// app.use('/api/v1/health_uas', createProxyMiddleware({
+//     target: 'http://django-user-alert-service:8001',
+//     changeOrigin: true,
+// }));
 
 app.use('/api/v1/current-weather', cacheMiddleware, async (req, res) => {
     const cacheKey = req.originalUrl;
@@ -92,6 +92,31 @@ app.use('/api/v1/weather-prediction', cacheMiddleware, async (req, res) => {
     }
 });
 
+app.get('/api/v1/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
+async function postOnStart() {
+  const anotherServiceUrl = 'http://service_discovery:5000/register';
+  const payload = {
+    name: 'gateway',
+    ip: '127.0.0.1',
+    port: '3000',
+  };
+
+  try {
+    const response = await axios.post(anotherServiceUrl, payload);
+    if (response.status === 200) {
+      console.log('Successfully registered with the other service.');
+    } else {
+      console.error(`Failed to register with the other service. Status code: ${response.status}`);
+    }
+  } catch (error) {
+    console.error(`Error registering with the other service: ${error.message}`);
+  }
+}
+
 app.listen(PORT, () => {
     console.log(`Gateway listening on port ${PORT}`);
+    postOnStart();
 });

@@ -83,3 +83,13 @@ services:
       - user_alert_service
       - weather_data_service
       - redis
+
+  service_discovery:
+    build:
+      context: ./service_discovery
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - user_alert_service
+      - weather_data_service
