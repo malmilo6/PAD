@@ -3,7 +3,10 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const axios = require('axios');
 const rateLimit = require('express-rate-limit');
+const loadBalancerUrl = 'http://nginx_load_balancer'; // Point to the load balancer
+const httpProxy = require('http-proxy');
 
+const proxy = httpProxy.createProxyServer();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -48,11 +51,11 @@ const cacheMiddleware = async (req, res, next) => {
 
 // Proxy for Weather Data Service
 
-// app.use('/api/v1/health_wds', createProxyMiddleware({
-//     target: 'http://django-weather-data-service:8000',
-//     changeOrigin: true,
-// }));
-//
+app.use('/api/v1/health_wds', createProxyMiddleware({
+    target: 'http://django-weather-data-service:8000',
+    changeOrigin: true,
+}));
+
 // // Proxy for User Alert Service
 // app.use('/api/v1/health_uas', createProxyMiddleware({
 //     target: 'http://django-user-alert-service:8001',
@@ -76,21 +79,21 @@ app.use('/api/v1/current-weather', cacheMiddleware, async (req, res) => {
 });
 
 
-app.use('/api/v1/weather-prediction', cacheMiddleware, async (req, res) => {
-    const cacheKey = req.originalUrl;
-
-    try {
-        const response = await axios.get('http://django-user-alert-service:8001' + req.originalUrl);
-
-        // Cache
-        await redisClient.setEx(cacheKey, 60, JSON.stringify(response.data));
-
-        res.status(200).json(response.data);
-    } catch (error) {
-        console.error('Error fetching health data:', error);
-        res.status(500).json({ error: 'Unable to fetch health data' });
-    }
-});
+// app.use('/api/v1/weather-prediction', cacheMiddleware, async (req, res) => {
+//     const cacheKey = req.originalUrl;
+//
+//     try {
+//         const response = await axios.get('http://django-user-alert-service:8001' + req.originalUrl);
+//
+//         // Cache
+//         await redisClient.setEx(cacheKey, 60, JSON.stringify(response.data));
+//
+//         res.status(200).json(response.data);
+//     } catch (error) {
+//         console.error('Error fetching health data:', error);
+//         res.status(500).json({ error: 'Unable to fetch health data' });
+//     }
+// });
 
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ status: 'healthy' });
@@ -115,6 +118,18 @@ async function postOnStart() {
     console.error(`Error registering with the other service: ${error.message}`);
   }
 }
+
+app.use((req, res) => {
+  // Log the incoming request
+  console.log(`Received request for: ${req.url}`);
+
+  // Forward the request to the load balancer
+  proxy.web(req, res, { target: loadBalancerUrl }, (error) => {
+    console.error(`Error proxying request to ${loadBalancerUrl}:`, error);
+    res.status(500).send('An error occurred while forwarding the request.');
+  });
+});
+
 
 app.listen(PORT, () => {
     console.log(`Gateway listening on port ${PORT}`);

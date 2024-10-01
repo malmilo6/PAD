@@ -4,13 +4,15 @@ import time
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from services import get_current_weather, get_weather_prediction
+from services import get_current_weather, get_weather_prediction, process_weather_data
 from backend.utils import *
 from backend.models import WeatherReport
 from django.utils import timezone
+from circuit_breaker import circuit_breaker_decorator
 
 
 class CurrentWeatherView(APIView):
+    @circuit_breaker_decorator
     @timeout(seconds=10)
     def get(self, request, location):
         weather_data = get_current_weather(location)
@@ -23,20 +25,19 @@ class CurrentWeatherView(APIView):
 
 
 class GenerateWeatherReportView(APIView):
+    @circuit_breaker_decorator
     @timeout(seconds=10)
     def get(self, request, location):
-        weather_data = get_current_weather(location)
-        WeatherReport.objects.create(
-            location=weather_data.location,
-            temperature=weather_data.temperature,
-            wind_speed=weather_data.wind_speed,
-            precipitation=weather_data.weather,
-            reported_at=timezone.now()
-        )
-        return 200
+        current_weather = get_current_weather(location)
+        forecast = get_weather_prediction(location)
+
+        resp = process_weather_data(current_weather, forecast)
+        return resp
 
 
 class WeatherPredictionView(APIView):
+    @circuit_breaker_decorator
+    @timeout(seconds=10)
     def get(self, request, location):
         weather_data = get_weather_prediction(location)
         return Response({
@@ -50,6 +51,13 @@ class WeatherPredictionView(APIView):
 
 
 class HealthCheck(APIView):
+    @circuit_breaker_decorator
     @timeout(seconds=10)
     def get(self, request):
         return Response({"status": "healthy"}, status=200)
+
+
+@circuit_breaker_decorator
+def failure_simulation(req):
+    # Raise an exception to simulate a failure for testing.
+    raise Exception("Simulated service failure")

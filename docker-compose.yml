@@ -12,7 +12,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: mongoadmin
       MONGO_INITDB_DATABASE: db_uas
     ports:
-      - 27017:27017
+      - "27017:27017"
+    networks:
+      - my_network
 
   db_wds:
     container_name: mysql-container-wds
@@ -29,7 +31,9 @@ services:
       - MYSQL_PASSWORD=${SQL_PASSWORD}
       - MYSQL_DATABASE=${SQL_DATABASE}
     ports:
-      - 3306:3306
+      - "3306:3306"
+    networks:
+      - my_network
 
   user_alert_service:
     container_name: django-user-alert-service
@@ -42,12 +46,45 @@ services:
     env_file:
       - .env
     ports:
-      - 8001:8001
-      - 50051:50051 # gRPC port
+      - "8001:8001"
     depends_on:
       - mongodb
-    links:
+    networks:
+      - my_network
+
+  user_alert_service-2:
+    container_name: django-user-alert-service-2
+    build:
+      context: ./user_alert_service
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8002
+    volumes:
+      - ./user_alert_service/:/usr/src/app
+    env_file:
+      - .env
+    ports:
+      - "8002:8002"
+    depends_on:
       - mongodb
+    networks:
+      - my_network
+
+  user_alert_service-3:
+    container_name: django-user-alert-service-3
+    build:
+      context: ./user_alert_service
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8003
+    volumes:
+      - ./user_alert_service/:/usr/src/app
+    env_file:
+      - .env
+    ports:
+      - "8003:8003"
+    depends_on:
+      - mongodb
+    networks:
+      - my_network
 
   weather_data_service:
     container_name: django-weather-data-service
@@ -60,18 +97,20 @@ services:
     env_file:
       - .env
     ports:
-      - 8000:8000
-      - 50052:50051 # gRPC port
+      - "8000:8000"
+      - "50052:50051" # gRPC port
     depends_on:
       - db_wds
-    links:
-      - db_wds
+    networks:
+      - my_network
 
   redis:
     image: redis:alpine
     container_name: redis
     ports:
       - "6379:6379"
+    networks:
+      - my_network
 
   gateway:
     build:
@@ -83,6 +122,8 @@ services:
       - user_alert_service
       - weather_data_service
       - redis
+    networks:
+      - my_network
 
   service_discovery:
     build:
@@ -93,3 +134,22 @@ services:
     depends_on:
       - user_alert_service
       - weather_data_service
+    networks:
+      - my_network
+
+  nginx_load_balancer:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - user_alert_service
+      - user_alert_service-2
+      - user_alert_service-3
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge  # Default network driver
