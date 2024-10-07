@@ -56,3 +56,12 @@ class WeatherReport(models.Model):
 
     def __str__(self):
         return f"WeatherReport for {self.location} at {self.reported_at}"
+
+
+class LoadAlert(models.Model):
+    timestamp = models.DateTimeField(default=timezone.now)
+    load_count = models.IntegerField()
+    description = models.TextField()
+
+    def __str__(self):
+        return f"Load Alert at {self.timestamp}: {self.load_count} requests"
