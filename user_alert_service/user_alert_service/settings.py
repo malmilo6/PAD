@@ -30,6 +30,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'django-user-alert-service',
+    'django-user-alert-service-2',
+    'django-user-alert-service-3',
     'django-weather-data-service',
     'your-domain.com',
     '0.0.0.0',
@@ -73,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'user_alert_service.middleware.RequestCounterMiddleware',
 ]
 
 ROOT_URLCONF = 'user_alert_service.urls'

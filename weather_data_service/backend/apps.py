@@ -1,6 +1,10 @@
+import os
+
 from django.apps import AppConfig
 import requests
 import logging
+
+from django.core.management import call_command
 
 logger = logging.getLogger(__name__)
 

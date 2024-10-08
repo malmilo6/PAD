@@ -7,5 +7,7 @@ urlpatterns = [
     path('weather-prediction/<str:location>/', WeatherPredictionView.as_view(), name='weather_prediction'),
     path('health/', HealthCheck.as_view()),
     path('failure/', failure_simulation),
-    path('generate-report/<str:location>', GenerateWeatherReportView.as_view(), name='generate-report')
+    path('generate-report/<str:location>', GenerateWeatherReportView.as_view(), name='generate-report'),
+    path('current-load/', current_load, name='current_load'),
+
 ]

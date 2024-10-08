@@ -1,6 +1,8 @@
+import os
 from django.apps import AppConfig
 import requests
 import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -17,11 +19,10 @@ class BackendConfig(AppConfig):
     def ping_service(self):
         service_url = 'http://service_discovery:5000/register'
         payload = {
-            'name': 'django-user-alert-service',
-            'ip': '127.0.0.1',
-            'port': '8001',
+            'name': os.getenv('SERVICE_NAME'),
+            'ip': os.getenv('SERVICE_IP'),
+            'port': os.getenv('SERVICE_PORT'),
         }
-
         try:
             response = requests.post(service_url, json=payload)
             if response.status_code == 200:

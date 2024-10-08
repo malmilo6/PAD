@@ -1,6 +1,7 @@
 import datetime
 import time
 
+from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,6 +10,8 @@ from backend.utils import *
 from backend.models import WeatherReport
 from django.utils import timezone
 from circuit_breaker import circuit_breaker_decorator
+
+from user_alert_service.middleware import RequestCounterMiddleware
 
 
 class CurrentWeatherView(APIView):
@@ -61,3 +64,8 @@ class HealthCheck(APIView):
 def failure_simulation(req):
     # Raise an exception to simulate a failure for testing.
     raise Exception("Simulated service failure")
+
+
+def current_load(request):
+    load_count = RequestCounterMiddleware.get_current_load()
+    return JsonResponse({'current_load': load_count})

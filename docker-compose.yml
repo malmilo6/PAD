@@ -49,6 +49,10 @@ services:
       - "8001:8001"
     depends_on:
       - mongodb
+    environment:
+      - SERVICE_IP=127.0.0.1
+      - SERVICE_PORT=8001
+      - SERVICE_NAME=django-user-alert-service
     networks:
       - my_network
 
@@ -66,6 +70,10 @@ services:
       - "8002:8002"
     depends_on:
       - mongodb
+    environment:
+      - SERVICE_IP=127.0.0.1
+      - SERVICE_PORT=8002
+      - SERVICE_NAME=django-user-alert-service-2
     networks:
       - my_network
 
@@ -83,6 +91,10 @@ services:
       - "8003:8003"
     depends_on:
       - mongodb
+    environment:
+      - SERVICE_IP=127.0.0.1
+      - SERVICE_PORT=8003
+      - SERVICE_NAME=django-user-alert-service-3
     networks:
       - my_network
 
