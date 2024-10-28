@@ -57,116 +57,171 @@ Continuous monitoring of both services' performance and health via endpoints, wi
 
 # API Documentation
 
-## Weather Alert Service
+# Get Weather Prediction (Direct)
 
-### 1. Retrieve Weather Data
-Retrieve all weather data entries for a specific location, or all entries if no location is specified.
+**Endpoint**: `GET /api/v1/weather-prediction/:location`
 
-- **URL**: `/weather/`
-- **Method**: `GET`
-- **URL Params**: 
-  - Optional: `location=[string]`
-- **Success Response**:
-  - **Code**: 200
-  - **Content**: Array of weather data objects
-- **Error Response**:
-  - **Code**: 404 NOT FOUND
-  - **Content**: `{ error : "Data not found" }`
+- **Description**: Direct retrieval of weather prediction for a specified location.
+- **URL**: `http://localhost:8001/api/v1/weather-prediction/New york`
+- **Method**: GET
 
-### 2. Get Future Weather Alerts
-Get future weather alerts for a specified location.
+**Response**:
+- Status 200: Weather prediction data for the specified location.
+# Gateway Health
 
-- **URL**: `/weather/alerts/future/`
-- **Method**: `GET`
-- **Query Params**: 
-  - Required: `location=[string]`
-- **Success Response**:
-  - **Code**: 200
-  - **Content**: Array of future weather alert objects
-- **Error Response**:
-  - **Code**: 404 NOT FOUND
-  - **Content**: `{ error : "Alerts not found for location" }`
+**Endpoint**: `GET /api/v1/health`
 
-### 3. Create Weather Data Entry
-Create a new weather data entry.
+- **Description**: Checks the health status of the gateway.
+- **URL**: `http://localhost:3000/api/v1/health`
+- **Method**: GET
 
-- **URL**: `/weather/create/`
-- **Method**: `POST`
-- **Data Params**:
-  ```json
-  {
-    "timestamp": "[datetime]",
-    "location": "[string]",
-    "temperature": "[float]",
-    "humidity": "[float]",
-    "wind_speed": "[float]",
-    "weather_condition": "[string]"
-  }
-- **Success Response**:
-  - **Code**: 201 CREATED
-- **Error Response**:
-  - **Code**: 404 NOT FOUND
-  - **Content**: `{ error : "Invalid data" }`
+**Response**:
+- Status 200: Gateway service is healthy.
 
-#### 4. Delete Weather Data Entry
-- **Endpoint**: `DELETE /weather/delete/{id}/`
-- **Description**: Delete a specific weather data entry.
-- **URL Params**:
-  - `id` (required): The ID of the weather data entry to delete.
-- **Success Response**:
-  - **Code**: 204 NO CONTENT
-- **Error Response**:
-  - **Code**: 404 NOT FOUND
-  - **Content**: `{ "error" : "Data not found" }`
 
-#### 5. Retrieve Severe Weather Alert Prediction
-- **Endpoint**: `GET /weather/predictions/`
-- **Description**: Retrieve predictions for severe weather based on current data trends.
-- **Success Response**:
-  - **Code**: 200
-  - **Content**: Array of prediction data
-- **Error Response**:
-  - **Code**: 404 NOT FOUND
-  - **Content**: `{ "error" : "Predictions not available" }`
+# Service List
 
-## User Alert Service
+**Endpoint**: `GET /services`
 
-#### 1. Get Weather Report for Location
-- **Endpoint**: `GET /profiles/weather-report/`
-- **Description**: Get a detailed weather report for a specified location.
-- **Query Params**:
-  - `location` (required)
-- **Success Response**:
-  - **Code**: 200
-  - **Content**: Weather report data
-- **Error Response**:
-  - **Code**: 404 NOT FOUND
-  - **Content**: `{ "error" : "Location not found" }`
+- **Description**: Retrieves a list of registered services.
+- **URL**: `http://localhost:5000/services`
+- **Method**: GET
 
-#### 2. Update User Alert Preferences
-- **Endpoint**: `PATCH /profiles/update/{id}/`
-- **Description**: Update the alert preferences associated with a user profile.
-- **URL Params**:
-  - `id` (required)
-- **Data Params**:
-  ```json
-  {
-    "alert_preferences": {
-      "email": "boolean",
-      "sms": "boolean",
-      "push_notification": "boolean"
-    }
-  }
-- **Success Response**:
-  - **Code**: 200
-  - **Content**: `{ "message": "Preferences updated successfully." }`
-- **Error Response**:
-  - **Code**: 404 BAD REQUEST
-  - **Content**: `{ "error": "Invalid request" }`
+**Response**:
+- Status 200: List of registered services.
 
-#### 3. WS Communication
-- **WS URL**: `ws://[host]/ws/alerts/`
-- **Protocol**: WebSocket
-- **Functionality**:
-  - **Clients connect to receive real-time alerts.**
-  - **Server sends alert messages when conditions meet user-specified preferences.**
+# Register Service Discovery
+
+**Endpoint**: `POST /register`
+
+- **Description**: Registers a service with the Service Discovery service.
+- **URL**: `http://localhost:5000/register`
+- **Method**: POST
+
+**Request Body (JSON)**:
+```json
+{
+    "name": "service_name",
+    "ip": "123",
+    "port": "123"
+}
+```
+
+
+# Generate Report
+
+**Endpoint**: `GET /api/v1/generate-report/:location`
+
+- **Description**: Generates a weather report for a specified location.
+- **URL**: `http://localhost:8001/api/v1/generate-report/Houston`
+- **Method**: GET
+
+**Response**:
+- Status 200: Generated report data.
+
+# Gateway UAS - Get Prediction with Load Balancing
+
+**Endpoint**: `GET /api/v1/weather-prediction/:location`
+
+- **Description**: Retrieves weather prediction for a specified location via the gateway with load balancing.
+- **URL**: `http://localhost:3000/api/v1/weather-prediction/Los Angeles`
+- **Method**: GET
+
+**Response**:
+- Status 200: Weather prediction data for the specified location.
+
+---
+
+# CRUD WDS Prediction
+
+**Endpoint**: `GET /api/v1/weather-prediction/`
+
+- **Description**: CRUD operations for weather predictions in WDS.
+- **URL**: `http://localhost:8000/api/v1/weather-prediction/`
+- **Method**: GET
+
+**Response**:
+- Status 200: Weather prediction data.
+
+# CRUD WDS Weather Data
+
+**Endpoint**: `GET /api/v1/weather-data/`
+
+- **Description**: CRUD operations for weather data in WDS.
+- **URL**: `http://localhost:8000/api/v1/weather-data/`
+- **Method**: GET/POST/UPDATE/DELETE
+
+**Request Body (JSON)**:
+```json
+{
+    "id": 1,
+    "location": "New York",
+    "temperature": 11.5,
+    "wind_speed": 0.79,
+    "precipitation": 40.55,
+    "timestamp": "2024-09-22T15:37:42.554245Z"
+}
+```
+
+# Gateway UAS - Get Current Weather (GRPC)
+
+**Endpoint**: `GET /api/v1/current-weather/:location`
+
+- **Description**: Retrieves the current weather for a specified location through the gateway.
+- **URL**: `http://localhost:3000/api/v1/current-weather/houston`
+- **Method**: GET
+
+**Response**:
+- Status 200: Current weather data for the specified location.
+
+# Health WDS
+
+**Endpoint**: `GET /api/v1/health`
+
+- **Description**: Checks the health status of the Weather Data Service (WDS).
+- **URL**: `http://localhost:8000/api/v1/health`
+- **Method**: GET
+
+**Response**:
+- Status 200: Service is healthy.
+
+# Health UAS
+
+**Endpoint**: `GET /api/v1/health`
+
+- **Description**: Checks the health status of the User Alert Service (UAS).
+- **URL**: `http://localhost:8001/api/v1/health`
+- **Method**: GET
+
+**Response**:
+- Status 200: Service is healthy.
+
+## Deployment and Testing
+
+### Prerequisites
+- **Docker**: Ensure Docker is installed to run the services in isolated containers.
+- **Docker Compose**: Used to define and run multi-container applications.
+
+### Steps
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/malmilo6/PAD.git
+   cd pad-project
+   
+2. **Build and up the image**
+To be able to access to get data, ensure to run GRPC on WDS after running the container, following the command inside the WDS container
+
+   ```bash
+   docker-compose build
+   docker-compose up
+   python manage.py run_grpc_server
+
+   
+3. **Testing**
+Enter docker container (wds or uas) entering following commands, and then run pytest
+
+   ```bash
+   docker-compose build
+   docker exec -it wds (or uas)
+   pytest
