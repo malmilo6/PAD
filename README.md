@@ -134,11 +134,11 @@ Continuous monitoring of both services' performance and health via endpoints, wi
 
 # CRUD WDS Prediction
 
-**Endpoint**: `GET /api/v1/weather-prediction/`
+**Endpoint**: `GET /api/v1/weather-prediction/:location`
 
 - **Description**: CRUD operations for weather predictions in WDS.
 - **URL**: `http://localhost:8000/api/v1/weather-prediction/`
-- **Method**: GET
+- **Method**: GET/POST/UPDATE/DELETE
 
 **Response**:
 - Status 200: Weather prediction data.
