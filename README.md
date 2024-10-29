@@ -16,19 +16,26 @@ Manages user data and preferences, receives alerts from the processing service, 
 
 Manages its own user database and handles communication back to the data processing service for feedback on delivery success.
 
-![image](https://github.com/user-attachments/assets/4482fbda-f803-4671-9840-956924c38381)
+<img width="615" alt="image" src="https://github.com/user-attachments/assets/48498dac-8cce-4424-85b5-ab16fe5b85d2">
 
-The actor, which could be an end-user or another service, interacts with the system by making HTTP/1.1 requests to the Gateway.
+	1.	The actor represents an end-user or another service making HTTP/1.1 requests to interact with the system.
+	2.	Gateway: Serving as the system’s entry point, the Gateway receives HTTP requests from the actor and forwards them to back-end services via gRPC calls. It is responsible for interacting with the Service Discovery component to dynamically locate and route requests to appropriate services, ensuring flexibility and resilience as services scale or move.
+	3.	Service Discovery: This component maintains a registry of services, such as the User Alert Service and Weather Data Service, and their instances. By helping the Gateway dynamically locate services, it enhances system scalability and fault tolerance, supporting a microservices architecture.
+	4.	Redis Cluster/Ring (Shared Cache): Redis acts as a shared caching layer across the system. Frequently accessed data, such as session information, cached weather data, or user preferences, is stored here to improve performance and reduce the load on databases. Both the User Alert Service and Weather Data Service can access this shared cache to retrieve data efficiently.
+	5.	User Alert Service: This service manages user-specific data and alert preferences. It relies on MongoDB (UAS DB) for storing user information, preferences, and alerts. MongoDB’s flexibility with unstructured data makes it suitable for handling diverse user profiles and alert settings. Additionally, the ETL Service pulls data from this service for analytical processing and storage in the Data Warehouse.
+	6.	Weather Data Service: This service is dedicated to processing and storing weather-related information. It uses MySQL (WDS DB), a relational database, to store structured weather data that requires complex queries and transactional integrity. The Weather Data Service can also access the Redis cache for frequently requested weather information. As with the User Alert Service, data flows from this service to the ETL Service for warehousing.
+	7.	ETL Service: The Extract, Transform, Load (ETL) Service gathers data from both the User Alert Service and Weather Data Service, processes it as needed, and loads it into the Data Warehouse. This warehouse serves as the central repository for aggregated and historical data, supporting analytics and reporting.
+	8.	Data Warehouse: Acting as a consolidated data store, the Data Warehouse integrates data from multiple services for analytical purposes. This storage layer is optimized for complex queries and analysis, making it a valuable resource for generating insights from the system’s data.
+	9.	Prometheus: Prometheus is employed for monitoring and collecting metrics across various services in the system. It gathers real-time data on service performance, health, and resource usage, enabling proactive system management.
+	10.	Grafana: Connected to Prometheus, Grafana provides a visualization interface for the collected metrics. Through dashboards and visualizations, stakeholders can monitor system health, performance trends, and key metrics, supporting informed decision-making.
 
-The Gateway serves as entry point and communicates with back-end services through gRPC calls. It's also responsible for interacting with the Service Discovery component to locate services within the architecture.
+Communication and Data Flow:
 
-Service Discovery is responsible for maintaining a registry of services (like User Alert Service and Weather Data Service) and their instances. It helps the Gateway locate these services dynamically, aiding in the resilience and scalability of the system.
-
-These two services handle specific business logic. The User Alert Service manages user data and alert preferences and relies on MongoDB for data storage. The Weather Data Service processes and stores weather data using MySQL.
-
-Redis is utilized as a shared cache, likely to store frequently accessed data like session information, cached weather data, or user preferences. Both services can quickly access this shared cache to improve performance and reduce database load.
-
-MongoDB and MySQL are used for persisting different types of data. MongoDB, being a NoSQL database, is likely used here for its flexibility in handling unstructured data, such as user profiles or alert settings. MySQL, a relational database, is suitable for structured data like weather records which require complex queries and transactional integrity.
+	•	HTTP: Used by the actor to communicate with the Gateway.
+	•	gRPC: Facilitates fast, low-latency communication between internal services (Gateway, User Alert Service, Weather Data Service, and ETL Service).
+	•	Redis Cache: Both the User Alert Service and Weather Data Service can access Redis for frequently accessed data.
+	•	Database Connections: MongoDB and MySQL serve as primary data stores for the User Alert Service and Weather Data Service, respectively.
+	•	ETL to Data Warehouse: ETL processes data from User Alert and Weather Data services, transforming it as needed before storing it in the Data Warehouse.
 ## Technology Stack and Communication Patterns
 ### Weather Alert Service
 **Technologies:** Utilizes gRPC for efficient communication with the notification service, databases for persistent storage, and caching mechanisms to enhance access to frequently used data. 
