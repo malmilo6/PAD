@@ -16,7 +16,7 @@ Manages user data and preferences, receives alerts from the processing service, 
 
 Manages its own user database and handles communication back to the data processing service for feedback on delivery success.
 
-<img width="615" alt="image" src="https://github.com/user-attachments/assets/48498dac-8cce-4424-85b5-ab16fe5b85d2">
+<img width="604" alt="image" src="https://github.com/user-attachments/assets/48860e16-4b68-42a2-a712-cab895cea2b6">
 
 	1.	The actor represents an end-user or another service making HTTP/1.1 requests to interact with the system.
 	2.	Gateway: Serving as the system’s entry point, the Gateway receives HTTP requests from the actor and forwards them to back-end services via gRPC calls. It is responsible for interacting with the Service Discovery component to dynamically locate and route requests to appropriate services, ensuring flexibility and resilience as services scale or move.
