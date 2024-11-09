@@ -1,15 +1,14 @@
-import datetime
-import time
+import random
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.template.defaultfilters import random
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from services import get_current_weather, get_weather_prediction, process_weather_data
 from backend.utils import *
-from backend.models import WeatherReport
-from django.utils import timezone
 from circuit_breaker import circuit_breaker_decorator
+from django.utils.crypto import get_random_string
+
 
 from user_alert_service.middleware import RequestCounterMiddleware
 
@@ -60,10 +59,17 @@ class HealthCheck(APIView):
         return Response({"status": "healthy"}, status=200)
 
 
-@circuit_breaker_decorator
-def failure_simulation(req):
-    # Raise an exception to simulate a failure for testing.
-    raise Exception("Simulated service failure")
+class FailureSimulation(APIView):
+    def get(self, request):
+        # Randomly decide to simulate a failure
+        failure  = get_random_string(1, allowed_chars="01") == "1"
+
+        if failure:
+            return Response({"status": "Server Failure"}, status=500)
+        else:
+            return Response({"status": "No Failure"}, status=200)
+
+
 
 
 def current_load(request):

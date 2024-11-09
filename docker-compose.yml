@@ -124,19 +124,6 @@ services:
     networks:
       - my_network
 
-  gateway:
-    build:
-      context: ./gateway
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    depends_on:
-      - user_alert_service
-      - weather_data_service
-      - redis
-    networks:
-      - my_network
-
   service_discovery:
     build:
       context: ./service_discovery
@@ -159,6 +146,20 @@ services:
       - user_alert_service
       - user_alert_service-2
       - user_alert_service-3
+    networks:
+      - my_network
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user_alert_service
+      - weather_data_service
+      - redis
+      - nginx_load_balancer
     networks:
       - my_network
 

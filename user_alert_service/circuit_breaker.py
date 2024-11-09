@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class CircuitBreaker:
     def __init__(self):
         self.breaker = pybreaker.CircuitBreaker(
-            fail_max=3,           # Number of failures before tripping
+            fail_max=50,           # Number of failures before tripping
             reset_timeout=30      # Timeout period before attempting to reset
         )
 
