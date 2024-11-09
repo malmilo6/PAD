@@ -19,3 +19,4 @@ pytest-django==4.6.0
 pytest-dotenv==0.5.2
 celery
 apscheduler
+django-prometheus

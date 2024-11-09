@@ -19,5 +19,6 @@ from backend.urls import url_patterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include(url_patterns))
+    path('api/v1/', include(url_patterns)),
+    path('', include('django_prometheus.urls')),
 ]

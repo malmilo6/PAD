@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s  # Interval to scrape the metrics
+
+scrape_configs:
+  - job_name: 'uas'
+    static_configs:
+      - targets: ['django-user-alert-service:8001']
+      - targets: ['django-user-alert-service-2:8002']
+      - targets: ['django-user-alert-service-3:8003']
+  - job_name: 'wds'
+    static_configs:
+      - targets: [django-weather-data-service:8000]
+

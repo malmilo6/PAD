@@ -1,4 +1,5 @@
 import random
+import time
 
 from django.http import JsonResponse
 from django.template.defaultfilters import random
@@ -62,7 +63,8 @@ class HealthCheck(APIView):
 class FailureSimulation(APIView):
     def get(self, request):
         # Randomly decide to simulate a failure
-        failure  = get_random_string(1, allowed_chars="01") == "1"
+        # failure  = get_random_string(1, allowed_chars="01") == "1"
+        failure = True
 
         if failure:
             return Response({"status": "Server Failure"}, status=500)
