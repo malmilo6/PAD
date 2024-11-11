@@ -65,3 +65,14 @@ class LoadAlert(models.Model):
 
     def __str__(self):
         return f"Load Alert at {self.timestamp}: {self.load_count} requests"
+
+class AlertPreference(models.Model):
+    user_id = models.CharField(max_length=100)
+    alert_type = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
+    notification_method = models.CharField(max_length=50, choices=[('email', 'Email'), ('sms', 'SMS'), ('push', 'Push Notification')], default='email')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"AlertPreference(user_id={self.user_id}, alert_type={self.alert_type}, location={self.location}, method={self.notification_method})"

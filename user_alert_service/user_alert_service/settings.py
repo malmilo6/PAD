@@ -111,14 +111,9 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'db_uas',
         'CLIENT': {
-            'host': 'mongodb://mongodb:27017',
-            'username': 'root',
-            'password': 'mongoadmin',
-            'authSource': 'admin',
-            'authMechanism': 'SCRAM-SHA-1',
+            'host': 'mongodb://root:mongoadmin@mongodb:27017/db_uas?authSource=admin&authMechanism=SCRAM-SHA-1',
         }
     }
-
 }
 
 # Password validation

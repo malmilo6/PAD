@@ -9,5 +9,5 @@ urlpatterns = [
     path('failure/', FailureSimulation.as_view(), name='failure'),
     path('generate-report/<str:location>', GenerateWeatherReportView.as_view(), name='generate-report'),
     path('current-load/', current_load, name='current_load'),
-
+    path('user-alert-preference/', CreateAlertPreference2PC.as_view(), name='user-alert-preference'),
 ]
