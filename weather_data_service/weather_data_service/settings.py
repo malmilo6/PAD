@@ -102,14 +102,22 @@ WSGI_APPLICATION = 'weather_data_service.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, 'db.sqlite3')),
-        "USER": os.environ.get("SQL_USER", "myuser"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "myuserpassword"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "3306"),
-    }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('SQL_DATABASE_WDS', 'wds_db'),
+        'USER': os.environ.get('SQL_USER', 'myuser2'),
+        'PASSWORD': os.environ.get('SQL_PASSWORD', 'myuserpassword2'),
+        'HOST': os.environ.get('SQL_HOST_WDS', 'db_wds'),
+        'PORT': os.environ.get('SQL_PORT_WDS', '3306'),
+    },
+    'db_wds_replica': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('SQL_DATABASE_REPLICA', 'wds_db'),
+        'USER': os.environ.get('SQL_USER', 'myuser2'),
+        'PASSWORD': os.environ.get('SQL_PASSWORD', 'myuserpassword2'),
+        'HOST': os.environ.get('SQL_HOST_REPLICA', 'db_wds_replica'),
+        'PORT': os.environ.get('SQL_PORT_REPLICA', '3306'),
+    },
 }
 
 
@@ -156,3 +164,5 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
