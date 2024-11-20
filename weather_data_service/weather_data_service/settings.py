@@ -118,7 +118,37 @@ DATABASES = {
         'HOST': os.environ.get('SQL_HOST_REPLICA', 'db_wds_replica'),
         'PORT': os.environ.get('SQL_PORT_REPLICA', '3306'),
     },
+    'db_wds_replica2': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wds_db',
+        'USER': 'myuser2',
+        'PASSWORD': 'myuserpassword2',
+        'HOST': 'db_wds_replica2',
+        'PORT': '3306',
+    },
+    'db_wds_replica3': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wds_db',
+        'USER': 'myuser2',
+        'PASSWORD': 'myuserpassword2',
+        'HOST': 'db_wds_replica3',
+        'PORT': '3306',
+    },
 }
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('SQL_DATABASE_WDS', 'wds_db'),
+#         'USER': os.environ.get('SQL_USER', 'myuser2'),
+#         'PASSWORD': os.environ.get('SQL_PASSWORD', 'myuserpassword2'),
+#         'HOST': 'proxysql',
+#         'PORT': '6033',
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#         },
+#     },
+# }
 
 
 

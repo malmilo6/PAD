@@ -225,9 +225,37 @@ To be able to access to get data, ensure to run GRPC on WDS after running the co
    docker-compose build
    docker-compose up
    python manage.py run_grpc_server
+   
+3. Set up DB Replication
+In master
+```CREATE USER 'replica_user'@'%' IDENTIFIED BY 'replica_password';
+GRANT REPLICATION SLAVE ON *.* TO 'replica_user'@'%';
+FLUSH PRIVILEGES;
+
+SHOW MASTER STATUS;
+```
+
+In each slave
+```
+STOP SLAVE;
+
+CHANGE MASTER TO
+    MASTER_HOST='db_wds',
+    MASTER_USER='replica_user',
+    MASTER_PASSWORD='replica_password',
+    MASTER_LOG_FILE='mysql-bin.000001',
+    MASTER_LOG_POS=154,
+    GET_MASTER_PUBLIC_KEY=1;
+
+START SLAVE;
+
+SHOW SLAVE STATUS\G
+```
+
+
 
    
-3. **Testing**
+4. **Testing**
 Enter docker container (wds or uas) entering following commands, and then run pytest
 
    ```bash

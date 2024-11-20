@@ -1,0 +1,45 @@
+datadir="/data"
+
+admin_variables=
+{
+    admin_credentials="admin:admin"
+    mysql_ifaces="0.0.0.0:6032"
+}
+
+mysql_variables=
+{
+    threads=4
+    default_query_delay=0
+    default_query_timeout=36000000
+    poll_timeout=2000
+    interfaces="0.0.0.0:6033"
+    default_schema="information_schema"
+    stacksize=1048576
+    server_version="8.0"
+    connect_timeout_server=10000
+}
+
+mysql_servers =
+(
+    { address = "db_wds" , port = 3306 , hostgroup = 0 , max_connections = 100 },
+    { address = "db_wds_replica" , port = 3306 , hostgroup = 1 , max_connections = 100 },
+    { address = "db_wds_replica2" , port = 3306 , hostgroup = 1 , max_connections = 100 },
+    { address = "db_wds_replica3" , port = 3306 , hostgroup = 1 , max_connections = 100 }
+
+)
+
+mysql_users =
+(
+    { username = "myuser2" , password = "myuserpassword2" , default_hostgroup = 0 , transaction_persistent = 1 }
+)
+
+mysql_query_rules =
+(
+    {
+        rule_id=1
+        active=1
+        match_pattern="^SELECT .*"
+        destination_hostgroup=1
+        apply=1
+    }
+)

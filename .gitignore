@@ -4,6 +4,9 @@
 __pycache__
 mysql_wds_data
 mysql_wds_data_replica
+mysql_wds_data_replica2
+mysql_wds_data_replica3
+
 node_modules
 
 mysql
