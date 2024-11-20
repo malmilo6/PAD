@@ -1,23 +1,28 @@
-const redis = require('redis');
+const redis = require('ioredis');
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const axios = require('axios');
 const rateLimit = require('express-rate-limit');
 const loadBalancerUrl = 'http://nginx_load_balancer'; // Point to the load balancer
 const httpProxy = require('http-proxy');
+const Redis = require("ioredis");
 
 const proxy = httpProxy.createProxyServer();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Create a Redis client
-const redisClient = redis.createClient({
-    url: 'redis://redis:6379', // Adjust to match your Redis service
-});
+const cluster = new Redis.Cluster([
+  { port: 7000, host: "redis-node-1" },
+  { port: 7001, host: "redis-node-2" },
+  { port: 7002, host: "redis-node-3" },
+  { port: 7003, host: "redis-node-4" },
+  { port: 7004, host: "redis-node-5" },
+  { port: 7005, host: "redis-node-6" },
+]);
 
-redisClient.connect().catch((err) => {
-    console.error("Redis connection error:", err);
-});
+// redisClient.connect().catch((err) => {
+//     console.error("Redis connection error:", err);
+// });
 
 // Concurent task limiter
 const limiter = rateLimit({
@@ -31,16 +36,21 @@ app.use(limiter);
 
 // Cache middleware
 const cacheMiddleware = async (req, res, next) => {
-    const cacheKey = req.originalUrl; // Use the request URL as the cache key
-
+    const cacheKey = req.originalUrl;
     try {
-        // Check Redis for cached data
-        const cachedData = await redisClient.get(cacheKey);
-
+        const cachedData = await cluster.get(cacheKey);
         if (cachedData) {
-            console.log('Serving from cache for:', cacheKey);
-            return res.status(200).json(JSON.parse(cachedData)); // Return cached response
+            console.log(`[Cache Hit] ${cacheKey}`);
+            try {
+                const data = JSON.parse(cachedData);
+                return res.status(200).json(data);
+            } catch (parseError) {
+                console.error('Error parsing cached data:', parseError);
+                await cluster.del(cacheKey); // Optional: Delete corrupted cache
+                next();
+            }
         } else {
+            console.log(`[Cache Miss] ${cacheKey}`);
             next();
         }
     } catch (err) {
@@ -64,36 +74,47 @@ app.use('/api/v1/health_wds', createProxyMiddleware({
 
 app.use('/api/v1/current-weather', cacheMiddleware, async (req, res) => {
     const cacheKey = req.originalUrl;
-
     try {
         const response = await axios.get('http://django-user-alert-service:8001' + req.originalUrl);
-
-        // Cache
-        await redisClient.setEx(cacheKey, 60, JSON.stringify(response.data));
-
-        res.status(200).json(response.data);
+        if (response.status === 200) {
+            await cluster.set(cacheKey, JSON.stringify(response.data), 'EX', 60);
+            res.status(200).json(response.data);
+        } else {
+            res.status(response.status).json({ error: response.statusText });
+        }
     } catch (error) {
-        console.error('Error fetching health data:', error);
-        res.status(500).json({ error: 'Unable to fetch health data' });
+        if (error.response) {
+            res.status(error.response.status).json({ error: error.response.statusText });
+        } else if (error.request) {
+            res.status(503).json({ error: 'No response from backend service' });
+        } else {
+            res.status(500).json({ error: 'Error setting up request to backend service' });
+        }
     }
 });
 
 
-// app.use('/api/v1/weather-prediction', cacheMiddleware, async (req, res) => {
-//     const cacheKey = req.originalUrl;
-//
-//     try {
-//         const response = await axios.get('http://django-user-alert-service:8001' + req.originalUrl);
-//
-//         // Cache
-//         await redisClient.setEx(cacheKey, 60, JSON.stringify(response.data));
-//
-//         res.status(200).json(response.data);
-//     } catch (error) {
-//         console.error('Error fetching health data:', error);
-//         res.status(500).json({ error: 'Unable to fetch health data' });
-//     }
-// });
+
+app.use('/api/v1/weather-prediction', cacheMiddleware, async (req, res) => {
+    const cacheKey = req.originalUrl;
+    try {
+        const response = await axios.get('http://django-user-alert-service:8001' + req.originalUrl);
+        if (response.status === 200) {
+            await cluster.set(cacheKey, JSON.stringify(response.data), 'EX', 60);
+            res.status(200).json(response.data);
+        } else {
+            res.status(response.status).json({ error: response.statusText });
+        }
+    } catch (error) {
+        if (error.response) {
+            res.status(error.response.status).json({ error: error.response.statusText });
+        } else if (error.request) {
+            res.status(503).json({ error: 'No response from backend service' });
+        } else {
+            res.status(500).json({ error: 'Error setting up request to backend service' });
+        }
+    }
+});
 
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ status: 'healthy' });

@@ -133,13 +133,100 @@ services:
     networks:
       - my_network
 
-  redis:
-    image: redis:alpine
-    container_name: redis
+
+  redis-node-1:
+    image: redis:latest
     ports:
-      - "6379:6379"
+      - "7000:7000"
     networks:
       - my_network
+    hostname: redis-node-1
+    volumes:
+      - ./redis/node_1:/redis
+    command: sh -c "redis-server /redis/redis.conf --cluster-announce-ip $(hostname -i) --cluster-announce-port 7000 --cluster-announce-bus-port 17000"
+    expose:
+      - "7000"
+      - "17000"
+
+  redis-node-2:
+    image: redis:latest
+    networks:
+      - my_network
+    hostname: redis-node-2
+    volumes:
+      - ./redis/node_2:/redis
+    command: sh -c "redis-server /redis/redis.conf --cluster-announce-ip $(hostname -i) --cluster-announce-port 7001 --cluster-announce-bus-port 17001"
+    expose:
+      - "7001"
+      - "17001"
+
+  redis-node-3:
+    image: redis:latest
+    networks:
+      - my_network
+    hostname: redis-node-3
+    volumes:
+      - ./redis/node_3:/redis
+    command: sh -c "redis-server /redis/redis.conf --cluster-announce-ip $(hostname -i) --cluster-announce-port 7002 --cluster-announce-bus-port 17002"
+    expose:
+      - "7002"
+      - "17002"
+
+  redis-node-4:
+    image: redis:latest
+    networks:
+      - my_network
+    hostname: redis-node-4
+    volumes:
+      - ./redis/node_4:/redis
+    command: sh -c "redis-server /redis/redis.conf --cluster-announce-ip $(hostname -i) --cluster-announce-port 7003 --cluster-announce-bus-port 17003"
+    expose:
+      - "7003"
+      - "17003"
+
+  redis-node-5:
+    image: redis:latest
+    networks:
+      - my_network
+    hostname: redis-node-5
+    volumes:
+      - ./redis/node_5:/redis
+    command: sh -c "redis-server /redis/redis.conf --cluster-announce-ip $(hostname -i) --cluster-announce-port 7004 --cluster-announce-bus-port 17004"
+    expose:
+      - "7004"
+      - "17004"
+
+  redis-node-6:
+    image: redis:latest
+    networks:
+      - my_network
+    hostname: redis-node-6
+    volumes:
+      - ./redis/node_6:/redis
+    command: sh -c "redis-server /redis/redis.conf --cluster-announce-ip $(hostname -i) --cluster-announce-port 7005 --cluster-announce-bus-port 17005"
+    expose:
+      - "7005"
+      - "17005"
+
+  redis-cluster-creator:
+    image: redis:latest
+    networks:
+      - my_network
+    depends_on:
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+      - redis-node-6
+    command: sh -c "sleep 10; redis-cli --cluster create \
+      redis-node-1:7000 \
+      redis-node-2:7001 \
+      redis-node-3:7002 \
+      redis-node-4:7003 \
+      redis-node-5:7004 \
+      redis-node-6:7005 \
+      --cluster-replicas 1 --cluster-yes"
 
   service_discovery:
     build:
@@ -175,7 +262,7 @@ services:
     depends_on:
       - user_alert_service
       - weather_data_service
-      - redis
+      - redis-node-1
       - nginx_load_balancer
     networks:
       - my_network

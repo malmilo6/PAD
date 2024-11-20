@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.utils.crypto import get_random_string
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,7 +18,7 @@ from pymongo import MongoClient
 MONGO_URI = "mongodb://root:mongoadmin@mongodb:27017/db_uas?authSource=admin&authMechanism=SCRAM-SHA-1"
 mongo_client = MongoClient(MONGO_URI)
 mongo_db = mongo_client["db_uas"]
-user_preferences_collection = mongo_db["backend_alertpreference"]
+user_preferences_collection = mongo_db["alertpreference"]
 
 
 class CurrentWeatherView(APIView):
@@ -143,5 +144,5 @@ class CreateAlertPreference2PC(APIView):
                 "user_id": user_id, "alert_type": alert_type, "location": location
             })
 
-            return Response({"status": "Transaction Rolled Back"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"status": f"Transaction Rolled Back, {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
