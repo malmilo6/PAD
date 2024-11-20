@@ -146,3 +146,55 @@ class CreateAlertPreference2PC(APIView):
 
             return Response({"status": f"Transaction Rolled Back, {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class CreateAlertPreferenceSaga(APIView):
+    WDS_SERVICE_URL = "http://django-weather-data-service:8000/api/v1/alert-saga/"
+
+    def post(self, request):
+        # Extract data from the request
+        user_id = request.data.get("user_id")
+        alert_type = request.data.get("alert_type")
+        location = request.data.get("location")
+
+        # Initialize Saga State
+        saga_data = {
+            "user_id": user_id,
+            "alert_type": alert_type,
+            "location": location,
+            "status": "started"
+        }
+
+        try:
+            # Step 1: Create alert preference in UAS
+            user_preferences_collection.insert_one({
+                "user_id": user_id,
+                "alert_type": alert_type,
+                "location": location
+            })
+            saga_data["status"] = "uas_created"
+
+            # Step 2: Notify WDS to create corresponding alert preference
+            wds_response = requests.post(f"{self.WDS_SERVICE_URL}create/", json={
+                "user_id": user_id,
+                "alert_type": alert_type,
+                "location": location
+            })
+            if wds_response.status_code != 200:
+                raise Exception("Failed to create alert in WDS")
+
+            saga_data["status"] = "completed"
+
+            return Response({"status": "Alert preference created successfully"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            # Compensating Actions
+            print(f"Error occurred: {e}, starting compensation.")
+            if saga_data.get("status") == "uas_created":
+                # Undo the creation in UAS
+                user_preferences_collection.delete_one({
+                    "user_id": user_id,
+                    "alert_type": alert_type,
+                    "location": location
+                })
+
+            return Response({"status": f"Transaction failed and compensated: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

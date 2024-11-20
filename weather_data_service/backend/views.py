@@ -93,3 +93,25 @@ class AlertSync2PC(APIView):
         # Rollback Phase: Remove the alert preference if it was created
         AlertPreference.objects.filter(user_id=user_id, alert_type=alert_type, location=location).delete()
         return Response({"status": "rolled_back"}, status=status.HTTP_200_OK)
+
+class AlertSaga(APIView):
+
+    @transaction.atomic
+    def post(self, request, action):
+        user_id = request.data.get("user_id")
+        alert_type = request.data.get("alert_type")
+        location = request.data.get("location")
+
+        if action == "create":
+            return self.create_alert(user_id, alert_type, location)
+        else:
+            return Response({"status": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def create_alert(self, user_id, alert_type, location):
+        try:
+            # Step 2: Create alert preference in WDS
+            AlertPreference.objects.create(user_id=user_id, alert_type=alert_type, location=location)
+            return Response({"status": "Alert preference created in WDS"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Failed to create alert preference in WDS: {e}")
+            return Response({"status": "failed", "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
