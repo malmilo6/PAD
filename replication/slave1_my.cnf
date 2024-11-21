@@ -1,3 +1,5 @@
 [mysqld]
 server-id=2
 relay_log=relay-bin
+log_bin=mysql-bin
+read_only=1
