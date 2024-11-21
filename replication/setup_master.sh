@@ -2,6 +2,9 @@
 
 CONTAINER_NAME="mysql-container-wds"
 
+# Manual failover
+#CONTAINER_NAME="mysql-container-wds-replica"
+
 MYSQL_USER="root"
 MYSQL_PASSWORD="rootpassword"
 
